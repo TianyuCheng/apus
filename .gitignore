@@ -67,3 +67,5 @@ vcpkg_installed/
 Testing/
 .cache/
 build/
+
+benchmark_results.txt

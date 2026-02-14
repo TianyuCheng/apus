@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
+set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
 project(apus VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -6,17 +7,23 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
-# Fetch doctest for testing
+# Fetch GTest for testing
 FetchContent_Declare(
-  doctest
-  GIT_REPOSITORY https://github.com/doctest/doctest.git
-  GIT_TAG        v2.4.11
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        v1.14.0
 )
 
-set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
-set(CMAKE_POLICY_VERSION_MINIMUM 3.5)
+FetchContent_Declare(
+  google_benchmark
+  GIT_REPOSITORY https://github.com/google/benchmark.git
+  GIT_TAG        v1.8.3
+)
 
-FetchContent_MakeAvailable(doctest)
+set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(googletest google_benchmark)
 
 # Library
 add_library(apus INTERFACE)
@@ -34,4 +41,13 @@ add_executable(apus_tests
     tests/test_free_list.cpp
     tests/test_slot_map.cpp
 )
-target_link_libraries(apus_tests PRIVATE apus doctest::doctest)
+target_link_libraries(apus_tests PRIVATE apus GTest::gtest GTest::gtest_main)
+# Benchmarking
+add_executable(apus_benchmarks
+    benchmarks/main.cpp
+    benchmarks/bench_memory_arena.cpp
+    benchmarks/bench_paged_memory_arena.cpp
+    benchmarks/bench_free_list.cpp
+    benchmarks/bench_slot_map.cpp
+)
+target_link_libraries(apus_benchmarks PRIVATE apus benchmark::benchmark)

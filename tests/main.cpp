@@ -1,2 +1,1 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-#include <doctest/doctest.h>
+// Main provided by GTest::gtest_main
