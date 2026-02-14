@@ -4,6 +4,7 @@ project(apus VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
 
@@ -33,7 +34,7 @@ target_include_directories(apus INTERFACE
 )
 
 # Testing
-add_executable(apus_tests 
+add_executable(apus_tests
     tests/main.cpp
     tests/test_memory_arena.cpp
     tests/test_paged_memory_arena.cpp
