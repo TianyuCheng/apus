@@ -275,6 +275,75 @@ namespace apus
         }
 
         /**
+         * @brief Changes the capacity of the ring buffer.
+         *
+         * If the new capacity is smaller than the current size, elements at the front
+         * are removed to fit the new capacity.
+         *
+         * @param new_capacity The new capacity.
+         */
+        void set_capacity(size_type new_capacity)
+        {
+            if (new_capacity == capacity_) return;
+
+            T* new_data = nullptr;
+            if (new_capacity > 0) {
+                new_data = static_cast<T*>(std::malloc(new_capacity * sizeof(T)));
+                if (!new_data) throw std::bad_alloc();
+            }
+
+            size_type old_size         = size_;
+            size_type elements_to_copy = std::min(old_size, new_capacity);
+
+            // if shrinking below current size, we drop elements from the FRONT
+            // to maintain the most recent elements (standard circular buffer behavior)
+            size_type start_index = (old_size > new_capacity) ? (old_size - new_capacity) : 0;
+
+            for (size_type i = 0; i < elements_to_copy; ++i) {
+                new (new_data + i) T(std::move((*this)[start_index + i]));
+            }
+
+            // clean up old storage
+            clear();
+            if (data_) std::free(data_);
+
+            data_     = new_data;
+            capacity_ = new_capacity;
+            size_     = elements_to_copy;
+            head_     = 0;
+            tail_     = (size_ == capacity_) ? 0 : size_;
+        }
+
+        /**
+         * @brief Resizes the buffer to contain count elements.
+         *
+         * If count is greater than current size, additional elements are appended.
+         * If count is greater than current capacity, the capacity is increased to match count.
+         * If count is smaller than current size, elements are removed from the back.
+         *
+         * @param count The new number of elements.
+         * @param value The value to initialize new elements with.
+         */
+        void resize(size_type count, const T& value = T())
+        {
+            if (count < size_) {
+                while (size_ > count) {
+                    size_type last = decrement(tail_);
+                    data_[last].~T();
+                    tail_ = last;
+                    --size_;
+                }
+            } else if (count > size_) {
+                if (count > capacity_) {
+                    set_capacity(count);
+                }
+                while (size_ < count) {
+                    push_back(value);
+                }
+            }
+        }
+
+        /**
          * @brief Accesses element at index (relative to head).
          */
         reference operator[](size_type index)

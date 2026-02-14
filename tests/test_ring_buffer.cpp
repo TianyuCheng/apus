@@ -96,4 +96,37 @@ namespace
         EXPECT_EQ(*(it + 3), 4);
     }
 
+    TEST(RingBufferTest, Resize)
+    {
+        apus::ring_buffer<int> rb(2);
+        rb.push_back(1);
+        rb.resize(4, 10);
+        EXPECT_EQ(rb.size(), 4);
+        EXPECT_EQ(rb.capacity(), 4);
+        EXPECT_EQ(rb[0], 1);
+        EXPECT_EQ(rb[3], 10);
+
+        rb.resize(2);
+        EXPECT_EQ(rb.size(), 2);
+        EXPECT_EQ(rb[0], 1);
+        EXPECT_EQ(rb[1], 10);
+    }
+
+    TEST(RingBufferTest, SetCapacity)
+    {
+        apus::ring_buffer<int> rb(5);
+        for (int i = 0; i < 5; ++i) rb.push_back(i);
+
+        rb.set_capacity(3); // should drop 0, 1 and keep 2, 3, 4
+        EXPECT_EQ(rb.size(), 3);
+        EXPECT_EQ(rb.capacity(), 3);
+        EXPECT_EQ(rb[0], 2);
+        EXPECT_EQ(rb[2], 4);
+
+        rb.set_capacity(10);
+        EXPECT_EQ(rb.size(), 3);
+        EXPECT_EQ(rb.capacity(), 10);
+        EXPECT_EQ(rb[0], 2);
+    }
+
 } // namespace
