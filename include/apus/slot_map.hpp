@@ -137,11 +137,55 @@ namespace apus
          */
         slot_map() = default;
 
-        // disable copying and moving
-        slot_map(const slot_map&)            = delete;
-        slot_map& operator=(const slot_map&) = delete;
-        slot_map(slot_map&&)                 = delete;
-        slot_map& operator=(slot_map&&)      = delete;
+        /**
+         * @brief Copy constructor.
+         */
+        slot_map(const slot_map& other)
+            : current_size_(0)
+        {
+            for (auto it = other.begin(); it != other.end(); ++it) {
+                add(*it);
+            }
+        }
+
+        /**
+         * @brief Move constructor.
+         */
+        slot_map(slot_map&& other) noexcept
+            : storage_arena_(std::move(other.storage_arena_)),
+              versions_arena_(std::move(other.versions_arena_)),
+              current_size_(other.current_size_)
+        {
+            other.current_size_ = 0;
+        }
+
+        /**
+         * @brief Copy assignment operator.
+         */
+        slot_map& operator=(const slot_map& other)
+        {
+            if (this != &other) {
+                // simple but not highly efficient: clear and copy
+                // ideally we would reuse already allocated pages
+                slot_map temp(other);
+                *this = std::move(temp);
+            }
+            return *this;
+        }
+
+        /**
+         * @brief Move assignment operator.
+         */
+        slot_map& operator=(slot_map&& other) noexcept
+        {
+            if (this != &other) {
+                storage_arena_  = std::move(other.storage_arena_);
+                versions_arena_ = std::move(other.versions_arena_);
+                current_size_   = other.current_size_;
+                other.current_size_ = 0;
+            }
+            return *this;
+        }
 
         /**
          * @brief Adds an object to the slot_map.

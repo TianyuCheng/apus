@@ -5,6 +5,35 @@
 namespace
 {
 
+    TEST(RingBufferTest, DefaultConstructor)
+    {
+        apus::ring_buffer<int> rb;
+        EXPECT_EQ(rb.capacity(), 0);
+        EXPECT_EQ(rb.size(), 0);
+        EXPECT_TRUE(rb.empty());
+        rb.push_back(1); // should not crash, just do nothing
+        EXPECT_EQ(rb.size(), 0);
+    }
+
+    TEST(RingBufferTest, MoveSupport)
+    {
+        apus::ring_buffer<int> rb(3);
+        rb.push_back(1);
+        rb.push_back(2);
+
+        apus::ring_buffer<int> rb2 = std::move(rb);
+        EXPECT_EQ(rb2.size(), 2);
+        EXPECT_EQ(rb2.front(), 1);
+        EXPECT_EQ(rb.size(), 0);
+        EXPECT_EQ(rb.capacity(), 0);
+
+        apus::ring_buffer<int> rb3;
+        rb3 = std::move(rb2);
+        EXPECT_EQ(rb3.size(), 2);
+        EXPECT_EQ(rb3.front(), 1);
+        EXPECT_EQ(rb2.size(), 0);
+    }
+
     TEST(RingBufferTest, BasicOperations)
     {
         apus::ring_buffer<int> rb(3);

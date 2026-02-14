@@ -176,3 +176,20 @@ TEST(SlotMapTest, EmptyAndSizeMethods)
     EXPECT_FALSE(sm.empty());
     EXPECT_EQ(sm.size(), 2);
 }
+
+TEST(SlotMapTest, MoveSupport)
+{
+    apus::slot_map<int> sm;
+    auto                h = sm.add(42);
+
+    apus::slot_map<int> sm2 = std::move(sm);
+    EXPECT_EQ(sm2.size(), 1);
+    EXPECT_EQ(sm2.at(h), 42);
+    EXPECT_EQ(sm.size(), 0);
+
+    apus::slot_map<int> sm3;
+    sm3 = std::move(sm2);
+    EXPECT_EQ(sm3.size(), 1);
+    EXPECT_EQ(sm3.at(h), 42);
+    EXPECT_EQ(sm2.size(), 0);
+}

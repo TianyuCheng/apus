@@ -48,6 +48,10 @@ namespace apus
         typed_memory_arena(const typed_memory_arena&)            = delete;
         typed_memory_arena& operator=(const typed_memory_arena&) = delete;
 
+        // enable moving
+        typed_memory_arena(typed_memory_arena&&)                 = default;
+        typed_memory_arena& operator=(typed_memory_arena&&)      = default;
+
         /**
          * @brief Allocate an element of type T.
          *

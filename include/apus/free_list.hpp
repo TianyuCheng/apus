@@ -26,11 +26,13 @@ namespace apus
          */
         free_list() = default;
 
-        // disable copying and moving
+        // disable copying
         free_list(const free_list&)            = delete;
         free_list& operator=(const free_list&) = delete;
-        free_list(free_list&&)                 = delete;
-        free_list& operator=(free_list&&)      = delete;
+
+        // enable moving
+        free_list(free_list&&)                 = default;
+        free_list& operator=(free_list&&)      = default;
 
         /**
          * @brief Adds an object to the free list.

@@ -118,6 +118,11 @@ namespace apus
         using const_iterator = basic_iterator<true>;
 
         /**
+         * @brief Construct a new ring_buffer object with zero capacity.
+         */
+        ring_buffer() : ring_buffer(0) {}
+
+        /**
          * @brief Construct a new ring_buffer with a given capacity.
          *
          * @param capacity The maximum number of elements the buffer can hold.
@@ -139,10 +144,14 @@ namespace apus
         ring_buffer(const ring_buffer& other)
             : capacity_(other.capacity_), size_(0), head_(0), tail_(0)
         {
-            data_ = static_cast<T*>(std::malloc(capacity_ * sizeof(T)));
-            if (!data_) throw std::bad_alloc();
-            for (size_type i = 0; i < other.size(); ++i) {
-                push_back(other[i]);
+            if (capacity_ > 0) {
+                data_ = static_cast<T*>(std::malloc(capacity_ * sizeof(T)));
+                if (!data_) throw std::bad_alloc();
+                for (size_type i = 0; i < other.size(); ++i) {
+                    push_back(other[i]);
+                }
+            } else {
+                data_ = nullptr;
             }
         }
 
@@ -165,7 +174,9 @@ namespace apus
         ~ring_buffer()
         {
             clear();
-            std::free(data_);
+            if (data_) {
+                std::free(data_);
+            }
         }
 
         /**
@@ -176,13 +187,19 @@ namespace apus
             if (this != &other) {
                 clear();
                 if (capacity_ != other.capacity_) {
-                    std::free(data_);
+                    if (data_) std::free(data_);
                     capacity_ = other.capacity_;
-                    data_     = static_cast<T*>(std::malloc(capacity_ * sizeof(T)));
-                    if (!data_) throw std::bad_alloc();
+                    if (capacity_ > 0) {
+                        data_ = static_cast<T*>(std::malloc(capacity_ * sizeof(T)));
+                        if (!data_) throw std::bad_alloc();
+                    } else {
+                        data_ = nullptr;
+                    }
                 }
-                for (size_type i = 0; i < other.size(); ++i) {
-                    push_back(other[i]);
+                if (capacity_ > 0) {
+                    for (size_type i = 0; i < other.size(); ++i) {
+                        push_back(other[i]);
+                    }
                 }
             }
             return *this;
@@ -195,7 +212,7 @@ namespace apus
         {
             if (this != &other) {
                 clear();
-                std::free(data_);
+                if (data_) std::free(data_);
                 data_           = other.data_;
                 capacity_       = other.capacity_;
                 size_           = other.size_;
@@ -217,6 +234,7 @@ namespace apus
          */
         void push_back(const T& value)
         {
+            if (capacity_ == 0) return;
             if (full()) {
                 data_[tail_].~T();
                 head_ = increment(head_);
@@ -234,6 +252,7 @@ namespace apus
          */
         void push_back(T&& value)
         {
+            if (capacity_ == 0) return;
             if (full()) {
                 data_[tail_].~T();
                 head_ = increment(head_);
