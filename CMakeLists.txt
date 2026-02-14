@@ -34,6 +34,17 @@ if(APUS_BUILD_BENCHMARKS)
   set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
   set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
   FetchContent_MakeAvailable(google_benchmark)
+
+  # Fetch Boost for comparison in benchmarks (Header-only usage)
+  FetchContent_Declare(
+    boost
+    URL https://github.com/boostorg/boost/releases/download/boost-1.84.0/boost-1.84.0.tar.gz
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+  )
+  FetchContent_GetProperties(boost)
+  if(NOT boost_POPULATED)
+    FetchContent_Populate(boost)
+  endif()
 endif()
 
 # library
@@ -53,6 +64,8 @@ if(APUS_BUILD_TESTS)
     tests/test_typed_memory_arena.cpp
     tests/test_free_list.cpp
     tests/test_slot_map.cpp
+    tests/test_small_vector.cpp
+    tests/test_ring_buffer.cpp
   )
   target_link_libraries(apus_tests PRIVATE apus::apus GTest::gtest GTest::gtest_main)
 endif()
@@ -65,8 +78,11 @@ if(APUS_BUILD_BENCHMARKS)
     benchmarks/bench_paged_memory_arena.cpp
     benchmarks/bench_free_list.cpp
     benchmarks/bench_slot_map.cpp
+    benchmarks/bench_small_vector.cpp
+    benchmarks/bench_ring_buffer.cpp
   )
   target_link_libraries(apus_benchmarks PRIVATE apus::apus benchmark::benchmark)
+  target_include_directories(apus_benchmarks PRIVATE ${boost_SOURCE_DIR})
 endif()
 
 # installation

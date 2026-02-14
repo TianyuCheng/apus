@@ -30,22 +30,46 @@ A basic non-compacting slot map providing stable handles to objects.
 - **Usage Scenario**: Ideal for Entity-Component Systems (ECS) or any system where you need "weak" pointers (handles) that can detect if the underlying object has been removed or replaced.
 - **Benefits**: Protects against the ABA problem using versioning and a high-bit "dead" flag; provides stable handles that remain valid regardless of other additions or removals.
 
+### small_vector
+A vector-like container with a fixed-size inline buffer.
+- **Usage Scenario**: High-performance code where most vectors are small, avoiding heap allocations for common cases.
+- **Benefits**: Allocation-free for $N$ elements; provides a standard STL-compliant interface; transitions seamlessly to heap storage if capacity is exceeded.
+
+### ring_buffer
+A fixed-capacity circular buffer providing efficient FIFO behavior.
+- **Usage Scenario**: Implementing streaming buffers, command queues, or sliding window algorithms.
+- **Benefits**: $O(1)$ push and pop operations at both ends; no reallocations; optimized iteration and random access.
+
 ## Dependencies
 
-- **doctest**: Fast, header-only testing framework (fetched via CMake).
+- **googletest**: Testing framework (fetched via CMake).
+- **google_benchmark**: Benchmarking framework (fetched via CMake).
 
 ## Building
 
 ```bash
 mkdir -p build
-cmake -S . -B build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
-## Running Tests
+## Development with `just`
+
+The project uses [just](https://github.com/casey/just) as a command runner for convenience.
 
 ```bash
-./build/apus_tests
+# configure the project
+just config Debug
+just config Release
+
+# build everything
+just build
+
+# run all tests
+just test
+
+# run all benchmarks
+just bench
 ```
 
 ## Author(s)
