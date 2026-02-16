@@ -55,7 +55,7 @@ TEST(SlotMapTest, AddAndBasicAccess)
 
 TEST(SlotMapTest, RemoveAndReuse)
 {
-    apus::slot_map<TestObject, apus::DEFAULT_SLOT_MAP_PAGE_SIZE, TestDeleter> sm;
+    apus::slot_map<TestObject, TestDeleter, apus::DEFAULT_SLOT_MAP_PAGE_SIZE> sm;
 
     auto h1 = sm.add(TestObject(10)); // index 0, version 1
     auto h2 = sm.add(TestObject(20)); // index 1, version 1
@@ -69,7 +69,7 @@ TEST(SlotMapTest, RemoveAndReuse)
     // Remove h2
     TestObject& obj2_ref = sm.at(h2); // Get reference before removing
     EXPECT_FALSE(obj2_ref.destructed);
-    sm.remove(h2);                      // h2.index = 1
+    sm.remove(h2);                    // h2.index = 1
     EXPECT_TRUE(obj2_ref.destructed); // Deleter should have been called
     EXPECT_EQ(sm.size(), 2);
 
@@ -95,7 +95,7 @@ TEST(SlotMapTest, RemoveAndReuse)
 
 TEST(SlotMapTest, IterationOverActiveElements)
 {
-    using sm_type = apus::slot_map<TestObject, apus::DEFAULT_SLOT_MAP_PAGE_SIZE, TestDeleter>;
+    using sm_type = apus::slot_map<TestObject, TestDeleter, apus::DEFAULT_SLOT_MAP_PAGE_SIZE>;
     sm_type sm;
 
     std::vector<sm_type::handle> handles;

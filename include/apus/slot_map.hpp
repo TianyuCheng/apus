@@ -64,7 +64,7 @@ namespace apus
      * @tparam PageSize The number of elements per page for underlying typed_memory_arena.
      * @tparam Deleter A functor to properly destruct objects when removed.
      */
-    template <typename T, std::size_t PageSize = DEFAULT_SLOT_MAP_PAGE_SIZE, typename Deleter = slot_map_deleter<T>>
+    template <typename T, typename Deleter = slot_map_deleter<T>, std::size_t PageSize = DEFAULT_SLOT_MAP_PAGE_SIZE>
     class slot_map
     {
         static_assert(PageSize > 0, "PageSize must be greater than 0");
@@ -179,9 +179,9 @@ namespace apus
         slot_map& operator=(slot_map&& other) noexcept
         {
             if (this != &other) {
-                storage_arena_  = std::move(other.storage_arena_);
-                versions_arena_ = std::move(other.versions_arena_);
-                current_size_   = other.current_size_;
+                storage_arena_      = std::move(other.storage_arena_);
+                versions_arena_     = std::move(other.versions_arena_);
+                current_size_       = other.current_size_;
                 other.current_size_ = 0;
             }
             return *this;
