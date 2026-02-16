@@ -446,6 +446,46 @@ namespace apus
             return begin() + index;
         }
 
+        /**
+         * @brief Finds an element in the vector.
+         *
+         * @param value The value to search for.
+         * @return iterator Iterator to the found element, or end() if not found.
+         */
+        iterator find(const T& value) { return std::find(begin(), end(), value); }
+
+        /**
+         * @brief Finds an element in the vector (const version).
+         *
+         * @param value The value to search for.
+         * @return const_iterator Iterator to the found element, or end() if not found.
+         */
+        const_iterator find(const T& value) const { return std::find(begin(), end(), value); }
+
+        /**
+         * @brief Checks if the vector contains a given value.
+         *
+         * @param value The value to search for.
+         * @return true If the value is found.
+         */
+        bool contains(const T& value) const { return find(value) != end(); }
+
+        /**
+         * @brief Removes the first occurrence of a value from the vector based on equivalence.
+         *
+         * @param value The value to remove.
+         * @return true If an element was removed, false otherwise.
+         */
+        bool remove(const T& value)
+        {
+            auto it = find(value);
+            if (it != end()) {
+                erase(it);
+                return true;
+            }
+            return false;
+        }
+
         // iterators
         // clang-format off
         iterator       begin()        noexcept { return data_;         }

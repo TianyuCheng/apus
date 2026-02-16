@@ -180,4 +180,49 @@ namespace
         EXPECT_EQ(*it, 3);
     }
 
+    TEST(SmallVectorTest, Find)
+    {
+        apus::small_vector<int, 4> v = {1, 2, 3};
+        auto                      it = v.find(2);
+        EXPECT_NE(it, v.end());
+        EXPECT_EQ(*it, 2);
+
+        auto it_not_found = v.find(4);
+        EXPECT_EQ(it_not_found, v.end());
+
+        const auto& cv  = v;
+        auto        cit = cv.find(3);
+        EXPECT_NE(cit, cv.end());
+        EXPECT_EQ(*cit, 3);
+    }
+
+    TEST(SmallVectorTest, Contains)
+    {
+        apus::small_vector<int, 4> v = {1, 2, 3};
+        EXPECT_TRUE(v.contains(1));
+        EXPECT_TRUE(v.contains(2));
+        EXPECT_TRUE(v.contains(3));
+        EXPECT_FALSE(v.contains(4));
+    }
+
+    TEST(SmallVectorTest, Remove)
+    {
+        apus::small_vector<int, 4> v = {1, 2, 3, 2};
+
+        // Remove existing item
+        EXPECT_TRUE(v.remove(2));
+        EXPECT_EQ(v.size(), 3);
+        EXPECT_EQ(v[1], 3); // {1, 3, 2}
+
+        // Remove another existing item
+        EXPECT_TRUE(v.remove(2));
+        EXPECT_EQ(v.size(), 2);
+        EXPECT_EQ(v[0], 1);
+        EXPECT_EQ(v[1], 3);
+
+        // Remove non-existing item
+        EXPECT_FALSE(v.remove(4));
+        EXPECT_EQ(v.size(), 2);
+    }
+
 } // namespace
