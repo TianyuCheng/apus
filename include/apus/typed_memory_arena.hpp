@@ -4,7 +4,6 @@
 #include <vector>
 #include <memory>
 #include <cstddef>
-#include <apus/free_list.hpp>
 #include <apus/memory_arena.hpp>
 
 namespace apus
@@ -64,7 +63,8 @@ namespace apus
         {
             // try to reuse an index from the freelist
             if (!freelist_.empty()) {
-                std::size_t index = freelist_.pop_back();
+                std::size_t index = freelist_.back();
+                freelist_.pop_back();
 
                 std::size_t page_idx         = index / PageSizeInElems;
                 std::size_t elem_idx_in_page = index % PageSizeInElems;
@@ -175,7 +175,7 @@ namespace apus
         std::vector<std::unique_ptr<memory_arena<PageSizeInBytes>>> pages_;
 
         // track the deallocated indices
-        apus::free_list<std::size_t> freelist_;
+        std::vector<std::size_t> freelist_;
 
         // tracks the next index for new allocations
         std::size_t next_global_index_ = 0;

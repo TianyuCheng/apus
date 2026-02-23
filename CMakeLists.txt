@@ -62,7 +62,6 @@ if(APUS_BUILD_TESTS)
     tests/test_memory_arena.cpp
     tests/test_paged_memory_arena.cpp
     tests/test_typed_memory_arena.cpp
-    tests/test_free_list.cpp
     tests/test_slot_map.cpp
     tests/test_small_vector.cpp
     tests/test_ring_buffer.cpp
@@ -76,7 +75,6 @@ if(APUS_BUILD_BENCHMARKS)
     benchmarks/main.cpp
     benchmarks/bench_memory_arena.cpp
     benchmarks/bench_paged_memory_arena.cpp
-    benchmarks/bench_free_list.cpp
     benchmarks/bench_slot_map.cpp
     benchmarks/bench_small_vector.cpp
     benchmarks/bench_ring_buffer.cpp
